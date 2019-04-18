@@ -1,6 +1,6 @@
 # MonadicJSON
 
-The JSONDecoder supplied by Foundation is currently broken when it comes to isomorphic decoding of JSON numbers.
+The JSONDecoder supplied by Foundation is currently broken when it comes to isomorphic decoding of JSON numbers with fractional precision (what would be decoded to Float, Double and Decimal).
 You can read about the issue on [the Swift bugtracker](https://bugs.swift.org/browse/SR-7054).
 
 This project does not aim to be faster than the built-in JSONSerialization-based JSONDecoder, simply to correct.
