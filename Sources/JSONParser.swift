@@ -49,11 +49,12 @@ public struct JSONParser {
     
     internal static func parse(scalars: Array<UnicodeScalar>, index: inout Array<UnicodeScalar>.Index) -> Result<JSON, Error> {
         while index < scalars.endIndex {
-            guard !CharacterSet.whitespacesAndNewlines.contains(scalars[index]) else {
+            let scalar = scalars[index]
+            guard !CharacterSet.whitespacesAndNewlines.contains(scalar) else {
                 index += 1
                 continue
             }
-            switch scalars[index] {
+            switch scalar {
             case "{":
                 return parseDictionary(scalars: scalars, index: &index)
                     .map(JSON.dictionary)
@@ -76,7 +77,7 @@ public struct JSONParser {
                     .map(JSON.bool)
                     .mapError(Error.bool)
             default:
-                return .failure(.invalidCharacter(scalars[index], index: index))
+                return .failure(.invalidCharacter(scalar, index: index))
             }
         }
         return .failure(.empty)
@@ -139,10 +140,11 @@ public struct JSONParser {
         var elements: [JSON] = []
         index += 1
         while index < scalars.endIndex, scalars[index] != "]" {
-            switch scalars[index] {
+            let scalar = scalars[index]
+            switch scalar {
             case ",":
                 return .failure(.array(.malformed(index: startIndex)))
-            case _ where CharacterSet.whitespacesAndNewlines.contains(scalars[index]):
+            case _ where CharacterSet.whitespacesAndNewlines.contains(scalar):
                 index += 1
             default:
                 switch parse(scalars: scalars, index: &index) {
@@ -152,8 +154,9 @@ public struct JSONParser {
                     elements.append(value)
                 }
                 while index < scalars.endIndex, scalars[index] != "," {
-                    switch scalars[index] {
-                    case _ where CharacterSet.whitespacesAndNewlines.contains(scalars[index]):
+                    let scalar = scalars[index]
+                    switch scalar {
+                    case _ where CharacterSet.whitespacesAndNewlines.contains(scalar):
                         index += 1
                     case "]":
                         index += 1
@@ -186,14 +189,13 @@ public struct JSONParser {
     internal static func parseBool(scalars: Array<UnicodeScalar>, index: inout Array<UnicodeScalar>.Index) -> Result<Bool, Error.Bool> {
         guard index < scalars.endIndex
             else { return .failure(.malformed(index: index)) }
-        let (t, f) = (true, false)
         switch scalars[index] {
-        case "t" where scalars.dropFirst(index).prefix(t.description.count) == ArraySlice(t.description.unicodeScalars):
-            index += t.description.count
-            return .success(t)
-        case "f" where scalars.dropFirst(index).prefix(f.description.count) == ArraySlice(f.description.unicodeScalars):
-            index += f.description.count
-            return .success(f)
+        case "t" where scalars.dropFirst(index).prefix(true.description.count) == ArraySlice(true.description.unicodeScalars):
+            index += true.description.count
+            return .success(true)
+        case "f" where scalars.dropFirst(index).prefix(false.description.count) == ArraySlice(false.description.unicodeScalars):
+            index += false.description.count
+            return .success(false)
         default:
             return .failure(.malformed(index: index))
         }
@@ -208,13 +210,15 @@ public struct JSONParser {
             else { return .failure(.unterminated(index: startIndex)) }
         index += 1
         while index < scalars.endIndex, scalars[index] != "\"" {
-            switch scalars[index] {
+            let scalar = scalars[index]
+            switch scalar {
             case "\\":
                 guard index + 1 < scalars.endIndex else { return .failure(.escapeSequence(index: startIndex)) }
                 index += 1
-                switch scalars[index] {
+                let scalar = scalars[index]
+                switch scalar {
                 case "/", "\\", "\"":
-                    string.append(scalars[index])
+                    string.append(scalar)
                 case "n":
                     string.append("\n")
                 case "r":
@@ -235,7 +239,7 @@ public struct JSONParser {
                     return .failure(.escapeCharacter(index: index))
                 }
             default:
-                string.append(scalars[index])
+                string.append(scalar)
             }
             index += 1
         }

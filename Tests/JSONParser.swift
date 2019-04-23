@@ -18,6 +18,28 @@ let decoder = Foundation.JSONDecoder()
 #endif
 
 class JSONTests: XCTestCase {
+    typealias MeasureType = [[String: Double]]
+    
+    let measureJSON: Data = {
+        return MeasureType
+            .arbitrary
+            .resize(100)
+            .map { try! encoder.encode($0) }
+            .generate
+    }()
+    
+    func testFoundationJSONDecoderSpeed() {
+        measure {
+            _ = try! Foundation.JSONDecoder().decode(MeasureType.self, from: measureJSON)
+        }
+    }
+    
+    func testMonadicJSONDecoderSpeed() {
+        measure {
+            _ = try! MonadicJSONDecoder().decode(MeasureType.self, from: measureJSON)
+        }
+    }
+    
     func testParserGenerally() {
         property("Random strings can't crash the parser") <- forAll { (string: String) in
             _ = JSONParser.parse(string)
