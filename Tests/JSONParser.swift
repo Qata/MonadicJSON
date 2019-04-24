@@ -9,35 +9,18 @@ import XCTest
 import SwiftCheck
 @testable import MonadicJSON
 
-let encoder = JSONEncoder()
-// Change this `false` to view failures of the inbuilt decoder.
-#if true
-let decoder = MonadicJSONDecoder()
-#else
-let decoder = Foundation.JSONDecoder()
-#endif
-
 class JSONTests: XCTestCase {
-    typealias MeasureType = [[String: Double]]
-    
-    let measureJSON: Data = {
-        return MeasureType
-            .arbitrary
-            .resize(100)
-            .map { try! encoder.encode($0) }
-            .generate
-    }()
-    
-    func testFoundationJSONDecoderSpeed() {
-        measure {
-            _ = try! Foundation.JSONDecoder().decode(MeasureType.self, from: measureJSON)
-        }
-    }
-    
-    func testMonadicJSONDecoderSpeed() {
-        measure {
-            _ = try! MonadicJSONDecoder().decode(MeasureType.self, from: measureJSON)
-        }
+    // Stop using this library if this test fails consistently.
+    // This is to test if the problem this library set out to solve has been solved in Foundation.
+    func testDecimalsWithFoundationJSONDecoder() {
+        // Size of the arrays generated.
+        // The larger the array, the lower the chance that the tests will miss incorrect values and report success.
+        let size = Int(1e4)
+        testDecoding(
+            decoder: JSONDecoder(),
+            gen: [Decimal].arbitrary.resize(size),
+            transform: { $0.expectFailure }
+        )
     }
     
     func testParserGenerally() {
@@ -149,7 +132,7 @@ class JSONTests: XCTestCase {
             JSONParser.parse(string).failure == .number(.numberBeginningWithZero(index: 0))
         }
         
-        property("NaN is invalid") <- forAll(Gen.pure("NaN").maybeCapitalized) { (string: String) in
+        property("NaN is invalid") <- forAll(Gen.pure("NaN").randomlyCapitalized) { (string: String) in
             JSONParser.parse(string).failed
         }
     }
@@ -159,7 +142,7 @@ class JSONTests: XCTestCase {
             JSONParser.parse(bool.description).success == .bool(bool)
         }
         
-        property("Capitalised bools are invalid") <- forAll(Bool.arbitrary.map { $0.description }.maybeCapitalized) { string in
+        property("Capitalised bools are invalid") <- forAll(Bool.arbitrary.map { $0.description }.randomlyCapitalized) { string in
             return (![true, false].contains(where: { $0.description == string })) ==> {
                 JSONParser.parse(string).failed
             }
@@ -171,7 +154,7 @@ class JSONTests: XCTestCase {
             JSONParser.parse("null").succeeded
         }
         
-        property("Capitalised nulls are invalid") <- forAll(Gen.pure("null").maybeCapitalized) { string in
+        property("Capitalised nulls are invalid") <- forAll(Gen.pure("null").randomlyCapitalized) { string in
             return (string != "null") ==> {
                 JSONParser.parse(string).failed
             }

@@ -10,6 +10,68 @@ import SwiftCheck
 import CoreGraphics
 @testable import MonadicJSON
 
+protocol TopLevelDecoder: CustomStringConvertible {
+    func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T
+    func setDateDecodingStrategy(_ strategy: JSONDecoder.DateDecodingStrategy)
+    func setDataDecodingStrategy(_ strategy: JSONDecoder.DataDecodingStrategy)
+}
+
+extension MonadicJSONDecoder: TopLevelDecoder {
+    func setDateDecodingStrategy(_ strategy: JSONDecoder.DateDecodingStrategy) {
+        dateDecodingStrategy = yield {
+            switch strategy {
+            case .deferredToDate:
+                return .deferredToDate
+            case .iso8601:
+                return .iso8601
+            case .secondsSince1970:
+                return .secondsSince1970
+            case .millisecondsSince1970:
+                return .millisecondsSince1970
+            case let .custom(closure):
+                return .custom(closure)
+            case let .formatted(formatter):
+                return .formatted(formatter)
+            @unknown default:
+                fatalError()
+            }
+        }
+    }
+    
+    func setDataDecodingStrategy(_ strategy: JSONDecoder.DataDecodingStrategy) {
+        dataDecodingStrategy = yield {
+            switch strategy {
+            case .base64:
+                return .base64
+            case .deferredToData:
+                return .deferredToData
+            case let .custom(closure):
+                return .custom(closure)
+            @unknown default:
+                fatalError()
+            }
+        }
+    }
+    
+    public var description: String {
+        return "Monadic"
+    }
+}
+
+extension JSONDecoder: TopLevelDecoder {
+    func setDateDecodingStrategy(_ strategy: JSONDecoder.DateDecodingStrategy) {
+        dateDecodingStrategy = strategy
+    }
+    
+    func setDataDecodingStrategy(_ strategy: JSONDecoder.DataDecodingStrategy) {
+        dataDecodingStrategy = strategy
+    }
+    
+    public var description: String {
+        return "Foundation"
+    }
+}
+
 extension Result {
     var succeeded: Bool {
         switch self {
@@ -84,7 +146,7 @@ extension Gen where A: Sequence, A.Element == UnicodeScalar {
 }
 
 extension Gen where A == String {
-    var maybeCapitalized: Gen {
+    var randomlyCapitalized: Gen {
         return self
             .map { $0.map(String.init).map(Gen.pure).map { $0.ap(.fromElements(of: [{ $0.capitalized }, { $0 }])) } }
             .flatMap(sequence)
@@ -136,46 +198,6 @@ extension JSONParser {
     static func parseString(_ string: String) -> Result<String, JSONParser.Error.String> {
         var index = 0
         return JSONParser.parseString(scalars: Array(string.unicodeScalars), index: &index)
-    }
-}
-
-extension MonadicJSONDecoder {
-    func setDateDecodingStrategy(_ strategy: MonadicJSONDecoder.DateDecodingStrategy) {
-        dateDecodingStrategy = strategy
-    }
-    
-    func setDataDecodingStrategy(_ strategy: MonadicJSONDecoder.DataDecodingStrategy) {
-        dataDecodingStrategy = strategy
-    }
-}
-
-extension JSONDecoder {
-    func setDateDecodingStrategy(_ strategy: MonadicJSONDecoder.DateDecodingStrategy) {
-        switch strategy {
-        case .deferredToDate:
-            dateDecodingStrategy = .deferredToDate
-        case .iso8601:
-            dateDecodingStrategy = .iso8601
-        case .secondsSince1970:
-            dateDecodingStrategy = .secondsSince1970
-        case .millisecondsSince1970:
-            dateDecodingStrategy = .millisecondsSince1970
-        case let .custom(closure):
-            dateDecodingStrategy = .custom(closure)
-        case let .formatted(formatter):
-            dateDecodingStrategy = .formatted(formatter)
-        }
-    }
-    
-    func setDataDecodingStrategy(_ strategy: MonadicJSONDecoder.DataDecodingStrategy) {
-        switch strategy {
-        case .base64:
-            dataDecodingStrategy = .base64
-        case .deferredToData:
-            dataDecodingStrategy = .deferredToData
-        case let .custom(closure):
-            dataDecodingStrategy = .custom(closure)
-        }
     }
 }
 

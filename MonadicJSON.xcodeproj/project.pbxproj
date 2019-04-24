@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F81130C7226FEACF00D1D24E /* Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81130C5226FEAA000D1D24E /* Speed.swift */; };
+		F81130C8226FEAD000D1D24E /* Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81130C5226FEAA000D1D24E /* Speed.swift */; };
+		F81130C9226FEAD100D1D24E /* Speed.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81130C5226FEAA000D1D24E /* Speed.swift */; };
 		F85A3A412267F75100E79C11 /* SwiftCheck.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F85A3A402267F75100E79C11 /* SwiftCheck.framework */; };
 		F85A3A432267F75E00E79C11 /* SwiftCheck.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F85A3A402267F75100E79C11 /* SwiftCheck.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F85A3A462267F7D000E79C11 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85A3A442267F7CD00E79C11 /* JSONParser.swift */; };
@@ -104,6 +107,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F81130C5226FEAA000D1D24E /* Speed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Speed.swift; sourceTree = "<group>"; };
 		F85A3A402267F75100E79C11 /* SwiftCheck.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftCheck.framework; path = Carthage/Build/Mac/SwiftCheck.framework; sourceTree = "<group>"; };
 		F85A3A442267F7CD00E79C11 /* JSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
 		F85A3A4C22682BCB00E79C11 /* MonadicJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MonadicJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -236,10 +240,11 @@
 			isa = PBXGroup;
 			children = (
 				F85A6D252266E93700F4581F /* Info.plist */,
-				F85A3A442267F7CD00E79C11 /* JSONParser.swift */,
+				F8A1D39E226EA50D00B7E17C /* Extensions.swift */,
 				F8A1D399226EA21600B7E17C /* FreeLiterals.swift */,
 				F8A1D3A6226EA6F300B7E17C /* FreeFunctions.swift */,
-				F8A1D39E226EA50D00B7E17C /* Extensions.swift */,
+				F85A3A442267F7CD00E79C11 /* JSONParser.swift */,
+				F81130C5226FEAA000D1D24E /* Speed.swift */,
 				F8A1D3A2226EA62900B7E17C /* Types.swift */,
 			);
 			path = Tests;
@@ -535,6 +540,7 @@
 				F8A1D3A8226EA6F300B7E17C /* FreeFunctions.swift in Sources */,
 				F85A3A6622682C0D00E79C11 /* JSONParser.swift in Sources */,
 				F8A1D3A0226EA50D00B7E17C /* Extensions.swift in Sources */,
+				F81130C8226FEAD000D1D24E /* Speed.swift in Sources */,
 				F8A1D39C226EA22700B7E17C /* FreeLiterals.swift in Sources */,
 				F8A1D3A4226EA62900B7E17C /* Types.swift in Sources */,
 			);
@@ -567,6 +573,7 @@
 				F8A1D3A9226EA6F300B7E17C /* FreeFunctions.swift in Sources */,
 				F85A3AB8226834B600E79C11 /* JSONParser.swift in Sources */,
 				F8A1D3A1226EA50D00B7E17C /* Extensions.swift in Sources */,
+				F81130C9226FEAD100D1D24E /* Speed.swift in Sources */,
 				F8A1D39D226EA22800B7E17C /* FreeLiterals.swift in Sources */,
 				F8A1D3A5226EA62900B7E17C /* Types.swift in Sources */,
 			);
@@ -589,6 +596,7 @@
 				F8A1D3A7226EA6F300B7E17C /* FreeFunctions.swift in Sources */,
 				F85A3A462267F7D000E79C11 /* JSONParser.swift in Sources */,
 				F8A1D39F226EA50D00B7E17C /* Extensions.swift in Sources */,
+				F81130C7226FEACF00D1D24E /* Speed.swift in Sources */,
 				F8A1D39B226EA22600B7E17C /* FreeLiterals.swift in Sources */,
 				F8A1D3A3226EA62900B7E17C /* Types.swift in Sources */,
 			);

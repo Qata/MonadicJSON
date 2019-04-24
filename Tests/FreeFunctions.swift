@@ -9,49 +9,55 @@ import Foundation
 import SwiftCheck
 @testable import MonadicJSON
 
-func testDecoding<T: CodableArbitrary>(for type: T.Type, dateStrategy: [(JSONEncoder.DateEncodingStrategy, MonadicJSONDecoder.DateDecodingStrategy)] = [(.deferredToDate, .deferredToDate)], dataStrategy: [(JSONEncoder.DataEncodingStrategy, MonadicJSONDecoder.DataDecodingStrategy)] = [(.deferredToData, .deferredToData)]) {
+func yield<T>(_ closure: () -> T) -> T {
+    return closure()
+}
+
+func testDecoding<T: CodableArbitrary>(for type: T.Type = T.self, decoder: TopLevelDecoder = MonadicJSONDecoder(), gen: Gen<T> = T.arbitrary, dateStrategy: [(JSONEncoder.DateEncodingStrategy, JSONDecoder.DateDecodingStrategy)] = [(.deferredToDate, .deferredToDate)], dataStrategy: [(JSONEncoder.DataEncodingStrategy, JSONDecoder.DataDecodingStrategy)] = [(.deferredToData, .deferredToData)], transform: @escaping (Property) -> Property = { $0 }) {
     let ((dateEncoding, dateDecoding), (dataEncoding, dataDecoding)) = Gen.zip(.fromElements(of: dateStrategy), .fromElements(of: dataStrategy)).generate
     encoder.dateEncodingStrategy = dateEncoding
     encoder.dataEncodingStrategy = dataEncoding
     decoder.setDateDecodingStrategy(dateDecoding)
     decoder.setDataDecodingStrategy(dataDecoding)
-    _testDecoding(for: T.self)
-    _testDecoding(for: Optional<T>.self)
-    switch DecodingType.arbitrary.generate {
-    case .array:
-        _testDecoding(for: [T].self)
-    case .nestedArray:
-        _testDecoding(for: [[T]].self)
-    case .dictionary:
-        _testDecoding(for: [String: T].self)
-    case .nestedDictionary:
-        _testDecoding(for: [String: [String: T]].self)
-    }
+    property("\(T.self) is valid for all permutations") <- transform(
+        conjoin(
+            decodeProperty(decoder: decoder, gen: gen),
+            decodeProperty(decoder: decoder, gen: gen.map { Optional($0) }),
+            yield {
+                let dictionaryGen = Gen
+                    .zip(String.arbitrary, gen)
+                    .proliferate
+                    .map { Dictionary($0, uniquingKeysWith: { $1 }) }
+                switch DecodingType.arbitrary.generate {
+                case .array:
+                    return decodeProperty(decoder: decoder, gen: gen.proliferate)
+                case .nestedArray:
+                    return decodeProperty(decoder: decoder, gen: gen.proliferate.proliferate)
+                case .dictionary:
+                    return decodeProperty(decoder: decoder, gen: dictionaryGen)
+                case .nestedDictionary:
+                    return decodeProperty(decoder: decoder, gen:
+                        Gen
+                            .zip(String.arbitrary, dictionaryGen)
+                            .proliferate
+                            .map { Dictionary($0, uniquingKeysWith: { $1 }) }
+                    )
+                }
+            }
+        )
+    )
 }
 
-func _testDecoding<T: CodableArbitrary>(for type: T.Type, _ gen: Gen<T> = T.arbitrary) {
-    property("\(T.self) is valid for all permutations") <- decodeProperty(containing: T.self, gen)
-}
-
-func decodeProperty<T: CodableArbitrary>(containing type: T.Type, _ gen: Gen<T>) -> Property {
+func decodeProperty<T: CodableArbitrary>(decoder: TopLevelDecoder, gen: Gen<T>) -> Property {
     print("*** Starting isomorphism tests for \(T.self) decoding")
     return forAllNoShrink(gen) {
         let label = "Isomorphic \(T.self) decode"
         let value = try! decoder.decode(DecoderTest<T>.self, from: data($0)).value
-        if value == $0 {
-            return true <?> label
-        } else {
-            print("Value before parsing: <\($0)>, after: <\(value)>")
-            return false <?> label
-        }
+        return (value == $0) <?> label
     }
 }
 
-func data<T: CodableArbitrary>(_ value: T) -> Data {
-    return try! encoder.encode(DecoderTest<T>(value: value))
-}
-
-func testOversizedInteger<T: Integer>(type: T.Type) {
+func testOversizedInteger<T: Integer>(type: T.Type, decoder: TopLevelDecoder = MonadicJSONDecoder()) {
     property("Oversized integer instantiation will always throw an error") <- forAll(integers.filterMap(Double.init).suchThat { $0 > Double(T.max) }) { value in
         do {
             _ = try decoder.decode(DecoderTest<T>.self, from: data(value))
@@ -66,6 +72,10 @@ func testOversizedInteger<T: Integer>(type: T.Type) {
         }
         return false
     }
+}
+
+func data<T: CodableArbitrary>(_ value: T) -> Data {
+    return try! encoder.encode(DecoderTest<T>(value: value))
 }
 
 func unicode(suchThat predicate: @escaping (UInt32) -> Bool) -> Gen<(UInt32, String)> {

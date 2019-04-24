@@ -9,6 +9,8 @@ import Foundation
 import SwiftCheck
 @testable import MonadicJSON
 
+let encoder = JSONEncoder()
+
 let allNumbers = UnicodeScalar.arbitrary.suchThat(CharacterSet(charactersIn: "0"..."9").contains).proliferate.string
 
 let integers = Gen.one(of: [
@@ -51,8 +53,10 @@ let invalidStrings: Gen<String> = strings
     .ap(.fromElements(of: [{ $0.dropFirst() }, { $0.dropLast() }, { $0.dropFirst().dropLast() }]))
     .map(String.init)
 
-let invalidAlphabetical: Gen<String> = Gen
+let alphabetical: Gen<UnicodeScalar> = Gen
     .fromElements(of: UnicodeScalar.allScalars(from: "a", through: "z") + UnicodeScalar.allScalars(from: "A", through: "Z"))
+
+let invalidAlphabetical: Gen<String> = alphabetical
     .proliferateNonEmpty
     .string
     .map { "\"" + $0 }
