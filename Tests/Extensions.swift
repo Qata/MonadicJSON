@@ -183,9 +183,8 @@ extension Collection {
 }
 
 extension Collection where Element == String {
-    func envelop(_ set: CharacterSet) -> [String] {
-        let characters = Array(0..<0xFF).compactMap(UnicodeScalar.init).filter(set.contains)
-        let gen = Gen.fromElements(of: characters).map(Character.init)
+    func envelop(_ set: Set<UnicodeScalar>) -> [String] {
+        let gen = Gen.fromElements(of: set).map(Character.init)
         return envelop(UInt.arbitrary.map { String(repeating: gen.generate, count: numericCast($0)) })
     }
 }

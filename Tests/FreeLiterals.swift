@@ -11,6 +11,13 @@ import SwiftCheck
 
 let encoder = JSONEncoder()
 
+let whitespacesAndNewlines: Set<UnicodeScalar> = [
+    "\n",
+    "\t",
+    " ",
+    "\r"
+]
+
 let allNumbers = UnicodeScalar.arbitrary.suchThat(CharacterSet(charactersIn: "0"..."9").contains).proliferate.string
 
 let integers = Gen.one(of: [
@@ -62,4 +69,5 @@ let invalidAlphabetical: Gen<String> = alphabetical
     .map { "\"" + $0 }
 
 let arrays = array(Gen.one(of: [randomNumbers, strings, validUnicode.map { $1 }, dictionary(Gen.one(of: [strings, validUnicode.map { $1 }]).proliferate, Gen.one(of: [randomNumbers, strings, validUnicode.map { $1 }]).proliferate)]).proliferate)
+
 let dictionaries = dictionary(Gen.one(of: [strings, validUnicode.map { $1 }]).proliferate, Gen.one(of: [randomNumbers, strings, validUnicode.map { $1 }, array(Gen.one(of: [randomNumbers, strings, validUnicode.map { $1 }]).proliferate)]).proliferate)

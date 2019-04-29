@@ -88,23 +88,23 @@ func unicode(suchThat predicate: @escaping (UInt32) -> Bool) -> Gen<(UInt32, Str
 
 func array(_ values: Gen<[String]>) -> Gen<String> {
     return values
-        .map { ["[", $0.intersperse(element: ",").envelop(.whitespacesAndNewlines).joined(), "]"].envelop(.whitespacesAndNewlines).joined() }
+        .map { ["[", $0.intersperse(element: ",").envelop(whitespacesAndNewlines).joined(), "]"].envelop(whitespacesAndNewlines).joined() }
 }
 
 func array(_ values: Gen<String>) -> Gen<String> {
     return values
         .proliferateNonEmpty
-        .map { ["[", $0.intersperse(element: ",").envelop(.whitespacesAndNewlines).joined(), "]"].envelop(.whitespacesAndNewlines).joined() }
+        .map { ["[", $0.intersperse(element: ",").envelop(whitespacesAndNewlines).joined(), "]"].envelop(whitespacesAndNewlines).joined() }
 }
 
 func dictionary(_ keys: Gen<[String]>, _ values: Gen<[String]>) -> Gen<String> {
     return Gen
         .zip(keys, values)
-        .map { ["{", zip($0, $1).map { [$0, ":", $1].envelop(.whitespacesAndNewlines).joined() }.intersperse(element: ",").envelop(.whitespacesAndNewlines).joined(), "}"].joined() }
+        .map { ["{", zip($0, $1).map { [$0, ":", $1].envelop(whitespacesAndNewlines).joined() }.intersperse(element: ",").envelop(whitespacesAndNewlines).joined(), "}"].joined() }
 }
 
 func dictionary(_ keys: Gen<String>, _ values: Gen<String>) -> Gen<String> {
     return Gen
         .zip(keys.proliferateNonEmpty, values.proliferateNonEmpty)
-        .map { ["{", zip($0, $1).map { [$0, ":", $1].envelop(.whitespacesAndNewlines).joined() }.intersperse(element: ",").envelop(.whitespacesAndNewlines).joined(), "}"].joined() }
+        .map { ["{", zip($0, $1).map { [$0, ":", $1].envelop(whitespacesAndNewlines).joined() }.intersperse(element: ",").envelop(whitespacesAndNewlines).joined(), "}"].joined() }
 }

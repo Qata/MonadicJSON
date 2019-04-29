@@ -328,9 +328,10 @@ public struct JSONParser {
 }
 
 internal extension JSONParser {
+    @inlinable
     static func isNumeric(_ scalar: UnicodeScalar) -> Bool {
         switch scalar {
-        case "0"..."9":
+        case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9":
             return true
         default:
             return false
