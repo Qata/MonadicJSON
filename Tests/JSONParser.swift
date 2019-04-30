@@ -10,16 +10,43 @@ import SwiftCheck
 @testable import MonadicJSON
 
 class JSONTests: XCTestCase {
-    // Stop using this library if this test fails consistently.
+    // Stop using this library if this test fails.
     // This is to test if the problem this library set out to solve has been solved in Foundation.
-    func testDecimalsWithFoundationJSONDecoder() {
-        // Size of the arrays generated.
-        // The larger the array, the lower the chance that the tests will miss incorrect values and report success.
-        let size = Int(1e4)
+    func testKnownBrokenDecimals() {
+        let brokenDecimals = [
+            "57.485767755861504",
+            "1.1172404971672576",
+            "3.4654083990338176",
+            "6.9181938875885312",
+            "29.625696350928512",
+            "-68.95552528769664",
+            "6.1481271341435392",
+            "0.3598915583666368",
+            "5.4359304839498752",
+            "-17.948831098982656",
+            "-0.5255438682545152",
+            "99.874581495808512",
+            "-2.6445110644867712",
+            "248.8941461002368",
+            "9.0577712447980288",
+            "20.874553160971584",
+            "-3.5121049544868992",
+            "0.76463401787641344",
+            "6.849477234107648",
+            "2.8994014887784576"
+        ]
+        let gen = Gen.fromElements(of: brokenDecimals.compactMap { Decimal(string: $0) })
+        
+        // JSONDecoder is expected to fail.
         testDecoding(
             decoder: JSONDecoder(),
-            gen: [Decimal].arbitrary.resize(size),
+            gen: gen,
             transform: { $0.expectFailure }
+        )
+        // MonadicJSONDecoder is expected to succeed.
+        testDecoding(
+            decoder: MonadicJSONDecoder(),
+            gen: gen
         )
     }
     
