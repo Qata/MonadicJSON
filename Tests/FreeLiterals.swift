@@ -21,10 +21,13 @@ let whitespacesAndNewlines: Set<UnicodeScalar> = [
 let allNumbers = UnicodeScalar.arbitrary.suchThat(CharacterSet(charactersIn: "0"..."9").contains).proliferate.string
 
 let integers = Gen.one(of: [
-    Gen.zip(UnicodeScalar.arbitrary.suchThat(CharacterSet(charactersIn: "1"..."9").contains).map { String(Character($0)) }, .frequency([(3, allNumbers), (1, .pure(""))])).map(+),
+    .zipWith(
+        Gen.fromElements(of: UnicodeScalar.allScalars(from: "1", through: "9")).map { String(Character($0)) },
+        .frequency([(3, allNumbers), (1, .pure(""))]),
+        transform: +
+    ),
     .pure("0")
-    ]
-)
+])
 
 let jsonNumbers: Gen<[String]> = .compose { c in
     let minus = Gen<String>.fromElements(of: ["-", ""])
