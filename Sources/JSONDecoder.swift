@@ -94,7 +94,7 @@ open class MonadicJSONDecoder {
             let leadingUnderscoreRange = stringKey.startIndex..<firstNonUnderscore
             let trailingUnderscoreRange = stringKey.index(after: lastNonUnderscore)..<stringKey.endIndex
             
-            var components = stringKey[keyRange].split(separator: "_")
+            let components = stringKey[keyRange].split(separator: "_")
             let joinedString : String
             if components.count == 1 {
                 // No underscores in key, leave the word as is - maybe already camel cased
