@@ -190,6 +190,16 @@ extension Collection where Element == String {
 }
 
 extension JSONParser {
+    static func parseStream(_ string: String) -> Result<JSON, JSONParser.Error> {
+        let d = string.data(using: .utf8)!
+        let i = InputStream(data: d)
+        i.open()
+        defer {
+            i.close()
+        }
+        return JSONParser.parse(stream: i)
+    }
+
     static func parse(_ string: String) -> Result<JSON, JSONParser.Error> {
         return JSONParser.parse(data: string.data(using: .utf8)!)
     }
@@ -197,6 +207,18 @@ extension JSONParser {
     static func parseString(_ string: String) -> Result<String, JSONParser.Error.String> {
         var index = 0
         return JSONParser.parseString(scalars: Array(string.unicodeScalars), index: &index)
+    }
+
+    static func parseStringStream(_ string: String) -> Result<String, JSONParser.Error.String> {
+        let d = string.data(using: .utf8)!
+        let i = InputStream(data: d)
+        i.open()
+        defer {
+            i.close()
+        }
+        var index = 0
+        var scalar = i.getNextScalar()
+        return JSONParser.parseStringStream(stream: i, scalar: &scalar, index: &index)
     }
 }
 

@@ -20,6 +20,14 @@ class SpeedTests: XCTestCase {
     func testDictionaries() {
         speedTestMonadic(dictionaries, closure: { self.measure($0) })
     }
+
+    func testArraysStream() {
+        speedTestMonadicStream(arrays, closure: { self.measure($0) })
+    }
+
+    func testDictionariesStream() {
+        speedTestMonadicStream(dictionaries, closure: { self.measure($0) })
+    }
 }
 
 extension SpeedTests {
@@ -34,5 +42,9 @@ extension SpeedTests {
     
     func speedTestMonadic(_ gen: Gen<String>, size: Double = measuringSize, closure: @escaping (() -> Void) -> Void) {
         speedTester(gen, size: Int(size), parser: { _ = JSONParser.parse($0) }, closure: closure)
+    }
+
+    func speedTestMonadicStream(_ gen: Gen<String>, size: Double = measuringSize, closure: @escaping (() -> Void) -> Void) {
+        speedTester(gen, size: Int(size), parser: { _ = JSONParser.parseStream($0) }, closure: closure)
     }
 }
