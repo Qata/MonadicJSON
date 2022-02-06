@@ -7,7 +7,7 @@
 
 import Foundation
 
-public indirect enum JSON: Equatable {
+public indirect enum JSON: Hashable, Codable {
     case null
     case string(String)
     case number(String)
