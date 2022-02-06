@@ -1,34 +1,40 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "MonadicJSON",
+    platforms: [
+        .macOS(.v10_15), .iOS(.v13), .watchOS(.v6), .tvOS(.v13),
+    ],
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "MonadicJSON",
-            targets: ["MonadicJSON"]),
+            targets: ["MonadicJSON"]
+        ),
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/typelift/SwiftCheck.git", from: "0.12.0"),
+        // Dev deps
+        .package(url: "https://github.com/typelift/SwiftCheck", from: "0.12.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "MonadicJSON",
-            dependencies: []),
+            dependencies: [
+            ],
+            path: "Sources"
+        ),
         .testTarget(
-            name: "MonadicJSON macOSTests",
-            dependencies: ["MonadicJSON", "SwiftCheck"]),
-        .testTarget(
-            name: "MonadicJSON iOSTests",
-            dependencies: ["MonadicJSON", "SwiftCheck"]),
-        .testTarget(
-            name: "MonadicJSON tvOSTests",
-            dependencies: ["MonadicJSON", "SwiftCheck"]),
+            name: "MonadicJSONTests",
+            dependencies: [
+                "MonadicJSON",
+                "SwiftCheck",
+            ],
+            path: "Tests"
+        ),
     ]
 )
