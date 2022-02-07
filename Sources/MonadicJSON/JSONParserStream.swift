@@ -24,7 +24,7 @@ extension JSONParser {
             switch scalar {
             case "{":
                 return parseDictionaryStream(stream: stream, scalar: &scalar, index: &index)
-                    .map(JSON.dictionary)
+                    .map(JSON.object)
             case "[":
                 return parseArrayStream(stream: stream, scalar: &scalar, index: &index)
                     .map(JSON.array)
@@ -54,7 +54,7 @@ extension JSONParser {
         let startIndex = index
         guard scalar != .eof,
             scalar == "{"
-            else { return .failure(.dictionary(.malformed(index: index))) }
+            else { return .failure(.object(.malformed(index: index))) }
         var elements: [String: JSON] = [:]
         scalar = stream.getNextScalar()
         index += 1
@@ -72,7 +72,7 @@ extension JSONParser {
                 scalar = stream.getNextScalar()
                 index += 1
                 guard scalar != .eof
-                    else { return .failure(.dictionary(.malformed(index: startIndex))) }
+                    else { return .failure(.object(.malformed(index: startIndex))) }
                 let value = parseStream(stream: stream, scalar: &scalar, index: &index)
                 switch (key, value) {
                 case let (.success(key), .success(value)):
@@ -91,17 +91,17 @@ extension JSONParser {
                         index += 1
                         return .success(elements)
                     default:
-                        return .failure(.dictionary(.malformed(index: index)))
+                        return .failure(.object(.malformed(index: index)))
                     }
                 }
                 scalar = stream.getNextScalar()
                 index += 1
             default:
-                return .failure(.dictionary(.malformed(index: index)))
+                return .failure(.object(.malformed(index: index)))
             }
         }
         guard scalar != .eof
-            else { return .failure(.dictionary(.malformed(index: startIndex))) }
+            else { return .failure(.object(.malformed(index: startIndex))) }
         scalar = stream.getNextScalar()
         index += 1
         return .success(elements)

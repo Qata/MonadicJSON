@@ -120,7 +120,7 @@ class JSONTestsStream: XCTestCase {
 
         property("Dictionaries that are unterminated will result in a malformed error") <- forAllNoShrink(Gen.pure("[{\"\":").proliferateNonEmpty) { strings in
             switch JSONParser.parseStream(strings.joined()).failure {
-            case .dictionary(.malformed)?:
+            case .object(.malformed)?:
                 return true
             default:
                 return false

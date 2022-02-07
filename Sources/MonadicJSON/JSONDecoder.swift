@@ -253,7 +253,7 @@ fileprivate class _JSONDecoder : Decoder {
                                                                     debugDescription: "Cannot get keyed decoding container -- found null value instead."))
         }
         
-        guard case let .dictionary(dictionary) = self.storage.topContainer else {
+        guard case let .object(dictionary) = self.storage.topContainer else {
             throw DecodingError._typeMismatch(at: self.codingPath, expectation: [String : Any].self, reality: self.storage.topContainer)
         }
         
@@ -600,7 +600,7 @@ fileprivate struct _JSONKeyedDecodingContainer<K : CodingKey> : KeyedDecodingCon
                                                                   debugDescription: "Cannot get \(KeyedDecodingContainer<NestedKey>.self) -- no value found for key \(_errorDescription(of: key))"))
         }
         
-        guard case let .dictionary(dictionary) = value else {
+        guard case let .object(dictionary) = value else {
             throw DecodingError._typeMismatch(at: self.codingPath, expectation: [String : Any].self, reality: value)
         }
         
@@ -944,7 +944,7 @@ fileprivate struct _JSONUnkeyedDecodingContainer : UnkeyedDecodingContainer {
                                                                     debugDescription: "Cannot get keyed decoding container -- found null value instead."))
         }
         
-        guard case let .dictionary(dictionary) = value else {
+        guard case let .object(dictionary) = value else {
             throw DecodingError._typeMismatch(at: self.codingPath, expectation: [String : Any].self, reality: value)
         }
         
@@ -1431,34 +1431,35 @@ extension DecodingError {
             return "a string/data"
         case .array:
             return "an array"
-        case .dictionary:
+        case .object:
             return "a dictionary"
         }
     }
 }
 
-fileprivate struct _JSONKey : CodingKey {
-    public var stringValue: String
-    public var intValue: Int?
+internal struct _JSONKey : CodingKey {
+    var stringValue: String
+    var intValue: Int?
     
-    public init?(stringValue: String) {
+    init?(stringValue: String) {
         self.stringValue = stringValue
         self.intValue = nil
     }
     
-    public init?(intValue: Int) {
+    init?(intValue: Int) {
         self.stringValue = "\(intValue)"
         self.intValue = intValue
     }
     
-    public init(stringValue: String, intValue: Int?) {
+    init(stringValue: String, intValue: Int?) {
         self.stringValue = stringValue
         self.intValue = intValue
     }
-    fileprivate init(index: Int) {
+    
+    init(index: Int) {
         self.stringValue = "Index \(index)"
         self.intValue = index
     }
     
-    fileprivate static let `super` = _JSONKey(stringValue: "super")!
+    static let `super` = _JSONKey(stringValue: "super")!
 }

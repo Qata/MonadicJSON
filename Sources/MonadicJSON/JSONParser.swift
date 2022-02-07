@@ -38,7 +38,7 @@ public struct JSONParser {
         case bool(Bool)
         case null(Null)
         case array(Array)
-        case dictionary(Dictionary)
+        case object(Dictionary)
     }
     
     public static func parse(data: Data) -> Result<JSON, Error> {
@@ -57,7 +57,7 @@ public struct JSONParser {
             switch scalar {
             case "{":
                 return parseDictionary(scalars: scalars, index: &index)
-                    .map(JSON.dictionary)
+                    .map(JSON.object)
             case "[":
                 return parseArray(scalars: scalars, index: &index)
                     .map(JSON.array)
@@ -87,7 +87,7 @@ public struct JSONParser {
         let startIndex = index
         guard index < scalars.endIndex,
             scalars[index] == "{"
-            else { return .failure(.dictionary(.malformed(index: index))) }
+            else { return .failure(.object(.malformed(index: index))) }
         var elements: [String: JSON] = [:]
         index += 1
         while index < scalars.endIndex, scalars[index] != "}" {
@@ -101,7 +101,7 @@ public struct JSONParser {
                 }
                 index += 1
                 guard index < scalars.endIndex
-                    else { return .failure(.dictionary(.malformed(index: startIndex))) }
+                    else { return .failure(.object(.malformed(index: startIndex))) }
                 let value = parse(scalars: scalars, index: &index)
                 switch (key, value) {
                 case let (.success(key), .success(value)):
@@ -118,16 +118,16 @@ public struct JSONParser {
                         index += 1
                         return .success(elements)
                     default:
-                        return .failure(.dictionary(.malformed(index: index)))
+                        return .failure(.object(.malformed(index: index)))
                     }
                 }
                 index += 1
             default:
-                return .failure(.dictionary(.malformed(index: index)))
+                return .failure(.object(.malformed(index: index)))
             }
         }
         guard index < scalars.endIndex
-            else { return .failure(.dictionary(.malformed(index: startIndex))) }
+            else { return .failure(.object(.malformed(index: startIndex))) }
         index += 1
         return .success(elements)
     }

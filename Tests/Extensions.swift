@@ -254,7 +254,7 @@ extension JSON: Arbitrary {
             String.arbitrary.map(JSON.string),
             Bool.arbitrary.map(JSON.bool),
             arbitraryNonRecursive.proliferate.map(JSON.array),
-            Gen.zip(String.arbitrary, arbitraryNonRecursive).proliferate.map { Dictionary($0, uniquingKeysWith: { $1 }) }.map(JSON.dictionary)
+            Gen.zip(String.arbitrary, arbitraryNonRecursive).proliferate.map { Dictionary($0, uniquingKeysWith: { $1 }) }.map(JSON.object)
             ]
         )
     }

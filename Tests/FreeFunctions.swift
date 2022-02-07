@@ -33,9 +33,9 @@ func testDecoding<T: CodableArbitrary>(for type: T.Type = T.self, decoder: TopLe
                     return decodeProperty(decoder: decoder, gen: gen.proliferate)
                 case .nestedArray:
                     return decodeProperty(decoder: decoder, gen: gen.proliferate.proliferate)
-                case .dictionary:
+                case .object:
                     return decodeProperty(decoder: decoder, gen: dictionaryGen)
-                case .nestedDictionary:
+                case .nestedObject:
                     return decodeProperty(decoder: decoder, gen:
                         Gen
                             .zip(String.arbitrary, dictionaryGen)

@@ -18,8 +18,8 @@ protocol Integer: Codable, Arbitrary, BinaryInteger {
 enum DecodingType: Arbitrary, CaseIterable {
     case array
     case nestedArray
-    case dictionary
-    case nestedDictionary
+    case object
+    case nestedObject
     
     static var arbitrary: Gen<DecodingType> {
         return .fromElements(of: allCases)
