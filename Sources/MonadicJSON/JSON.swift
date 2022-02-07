@@ -43,7 +43,7 @@ public indirect enum JSON: Hashable, Codable {
     case object([String: JSON])
     case array([JSON])
     
-    func encodable() throws -> some Encodable {
+    public func encodable() throws -> some Encodable {
         func recurse(json: JSON) throws -> AnyEncodable {
             switch json {
             case let .object(value):
