@@ -35,6 +35,9 @@ extension Null: Codable {
     }
 }
 
+public struct JSONDecimalError: Error {
+}
+
 public indirect enum JSON: Hashable, Codable {
     case null
     case string(String)
@@ -43,7 +46,7 @@ public indirect enum JSON: Hashable, Codable {
     case object([String: JSON])
     case array([JSON])
     
-    public func encodable() throws -> some Encodable {
+    public func encodable() throws -> Encodable {
         func recurse(json: JSON) throws -> AnyEncodable {
             switch json {
             case let .object(value):
@@ -51,7 +54,10 @@ public indirect enum JSON: Hashable, Codable {
             case let .array(value):
                 return try .init(value.map(recurse))
             case let .number(value):
-                return try .init(Decimal(value, format: .number))
+                guard let decimal = Decimal(string: value) else {
+                    throw JSONDecimalError()
+                }
+                return .init(decimal)
             case let .string(value):
                 return .init(value)
             case let .bool(value):
