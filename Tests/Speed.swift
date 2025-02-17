@@ -1,10 +1,3 @@
-//
-//  Speed.swift
-//  MonadicJSON macOS
-//
-//  Created by Charlotte Tortorella on 24/4/19.
-//
-
 import XCTest
 import SwiftCheck
 @testable import MonadicJSON
@@ -40,11 +33,29 @@ extension SpeedTests {
         }.once
     }
     
-    func speedTestMonadic(_ gen: Gen<String>, size: Double = measuringSize, closure: @escaping (() -> Void) -> Void) {
-        speedTester(gen, size: Int(size), parser: { _ = JSONParser.parse($0) }, closure: closure)
+    func speedTestMonadic(
+        _ gen: Gen<String>,
+        size: Double = measuringSize,
+        closure: @escaping (() -> Void) -> Void
+    ) {
+        speedTester(
+            gen,
+            size: Int(size),
+            parser: { _ = JSONParser.parse($0) },
+            closure: closure
+        )
     }
 
-    func speedTestMonadicStream(_ gen: Gen<String>, size: Double = measuringSize, closure: @escaping (() -> Void) -> Void) {
-        speedTester(gen, size: Int(size), parser: { _ = JSONParser.parseStream($0) }, closure: closure)
+    func speedTestMonadicStream(
+        _ gen: Gen<String>,
+        size: Double = measuringSize,
+        closure: @escaping (() -> Void) -> Void
+    ) {
+        speedTester(
+            gen,
+            size: Int(size),
+            parser: { _ = JSONParser.parseStream($0) },
+            closure: closure
+        )
     }
 }

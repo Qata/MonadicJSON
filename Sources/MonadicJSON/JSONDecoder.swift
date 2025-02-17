@@ -1,10 +1,3 @@
-//
-//  JSONDecoder.swift
-//  MonadicJSON macOS
-//
-//  Created by Charlotte Tortorella on 18/4/19.
-//
-
 import Foundation
 
 open class MonadicJSONDecoder {

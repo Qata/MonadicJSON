@@ -1,5 +1,12 @@
 # MonadicJSON
 
+## !!! DEPRECATED !!!
+
+The underlying issue was fixed circa iOS 17.
+The library is still functional, but there's no good reason to use it.
+
+## Original Description
+
 The JSONDecoder supplied by Foundation is currently broken when it comes to isomorphic decoding of JSON numbers with fractional precision (what would be decoded to Float, Double and Decimal).
 You can read about the issue on [the Swift bugtracker](https://bugs.swift.org/browse/SR-7054).
 
